@@ -1,0 +1,73 @@
+<?php $__env->startSection('content'); ?>
+<div align="center">
+<h1 style='width:90%;text-align:left;' >Loan Types</h1>
+</div>
+<div class="container">
+	<div align="right">
+	<input type="text" class="form-control" style="width:300px;display:inline" id = "searchbar" oninput="search()"></input>
+	<button class= "btn btn-primary" onclick="search()">Search</button>
+	</div>
+	<br>
+	<table class="table table-striped" id="main-table">
+		<tr>
+			<?php if($loan_types->first()): ?>
+				<?php $__currentLoopData = $loan_types->first(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $k => $v): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+					<th><?php echo e(ucwords(str_replace('_', ' ', $k))); ?></th>
+				<?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+				<th>Actions</th>
+			<?php else: ?>
+				<th> Empty </th>
+			<?php endif; ?>
+		</tr>
+		<?php $__currentLoopData = $loan_types; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $loan_type): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+			<tr>
+			<?php $__currentLoopData = $loan_type; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $k => $v): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+				<td> <?php echo e($v); ?> </td>
+			<?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+			<td no-search>
+			<?php if(Auth::User()->access_rights()->loans_types_view): ?>
+				<a href="<?php echo e(route('loan_types.view', ['id' => $loan_type->id])); ?>" class="link-tag">View</a>
+			<?php endif; ?>
+			<?php if(Auth::User()->access_rights()->loans_types_edit): ?>
+				<a href="<?php echo e(route('loan_types.edit', ['id' => $loan_type->id])); ?>" class="link-tag"> Edit</a>
+			<?php endif; ?>
+			<?php if(Auth::User()->access_rights()->loans_types_delete): ?>
+				<a href="<?php echo e(route('loan_types.delete', ['id' => $loan_type->id])); ?>" class="link-tag"> Delete</a>
+			<?php endif; ?>
+			</td>
+			</tr>
+		<?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+	</table>
+	<div>
+		<?php if(Auth::User()->access_rights()->loans_create): ?>
+			<a href="<?php echo e(route('loan_types.create')); ?>" class="link-tag"> Add Loan Type </a>
+		<?php endif; ?>
+	</div>
+</div>
+<script>
+	function search(){
+		var searchbar = document.getElementById("searchbar");
+		var tosearch = searchbar.value.toLowerCase();
+		var table = document.getElementById("main-table");
+		if(table && searchbar){
+			var rows = table.rows;
+			for(var i = 1; i < rows.length; i++){
+				var cells = rows[i].cells;
+				var includes = false;
+				for(var j = 0; j < cells.length; j++){
+					if(cells[j].innerHTML.toLowerCase().includes(tosearch) && !cells[j].hasAttribute("no-search")){
+						includes = true;
+						break;
+					}
+				}
+				if(includes){
+					rows[i].style.display = 'table-row';
+				}else{
+					rows[i].style.display = 'none';
+				}
+			}
+		}
+	}
+</script>
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.app', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>
